@@ -3,18 +3,18 @@ import Pokemon from "./Pokemon";
 
 const PokemonApplication = (props) => {
   const [showList, setShowList] = useState(false);
-  const [pkmnInfo, setPkmnInfo] = useState([]);
+  const [pkmnInfo, setPkmnInfo] = useState(null); // Initialize pkmnInfo as null
 
-useEffect(() => {
+  useEffect(() => {
     const pokemonData = async () => {
-      let data = await fetch(
-        `https://pokeapi.co/api/v2/pokemon/${props.list.i}`
-      );
-      let response = await data.json();
-      setPkmnInfo(response);
+      if (props.list.length > 0) { // Check if the props.list is not empty
+        let data = await fetch(props.list[0].url); // Access the first element in the list
+        let response = await data.json();
+        setPkmnInfo(response);
+      }
     };
     pokemonData();
-},[])
+  }, [props.list]); // Add props.list as a dependency to useEffect
 
   return (
     <div>
@@ -27,9 +27,9 @@ useEffect(() => {
       </button>
       <select>
         {showList &&
-          props.list.map((pokemonObj) => {
+          props.list.map((pokemonObj, index) => { // Add index parameter for the key attribute
             return (
-              <option value={pokemonObj.url} >
+              <option key={index} value={pokemonObj.url}>
                 {pokemonObj.name}
               </option>
             );
@@ -39,7 +39,6 @@ useEffect(() => {
       <Pokemon
         pkmnInfo={pkmnInfo}
         setPkmnInfo={setPkmnInfo}
-        
       />
     </div>
   );
